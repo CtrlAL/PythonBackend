@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: drf-seed
+  namespace: drf-url
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: seed
+          image: drf-seed:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - {name: SCYLLA_HOSTS, valueFrom: {configMapKeyRef: {name: drf-config, key: SCYLLA_HOSTS}}}
+            - {name: REDIS_URL, valueFrom: {configMapKeyRef: {name: drf-config, key: REDIS_URL}}}

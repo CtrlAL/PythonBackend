@@ -5,5 +5,5 @@ COPY seed/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY common/ ./common/
 COPY seed/seed.py ./seed.py
-ENV PYTHONPATH=/app/common
+ENV PYTHONPATH=/app
 CMD ["python", "seed.py"]
