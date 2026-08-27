@@ -1,8 +1,11 @@
 import os
+import sys
 import redis
 from flask import Flask, request, jsonify
 from sqlalchemy.exc import IntegrityError
 from models import db, Link
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "common"))
 
 try:
     from common.base62 import encode
