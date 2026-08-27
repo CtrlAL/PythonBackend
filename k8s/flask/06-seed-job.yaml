@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: flask-seed
+  namespace: flask-url
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: seed
+          image: flask-seed:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - {name: DATABASE_URL, valueFrom: {configMapKeyRef: {name: flask-config, key: DB_DSN}}}
+            - {name: REDIS_URL, valueFrom: {configMapKeyRef: {name: flask-config, key: REDIS_URL}}}

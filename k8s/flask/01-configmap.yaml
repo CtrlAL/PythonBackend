@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flask-config
+  namespace: flask-url
+data:
+  DATABASE_URL: "postgresql+psycopg2://shortener:shortener@postgres:5432/shortener"
+  REDIS_URL: "redis://redis:6379/0"
+  BASE_URL: "http://localhost"
+  DB_DSN: "postgresql://shortener:shortener@postgres:5432/shortener"
