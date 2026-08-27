@@ -2,6 +2,12 @@ import os, pytest
 os.environ.setdefault("DATABASE_URL", "sqlite:///:memory:")
 os.environ.setdefault("REDIS_URL", "redis://localhost:6379/0")
 os.environ.setdefault("BASE_URL", "http://localhost")
+import redis as _redis
+try:
+    import fakeredis
+    _redis.Redis = fakeredis.FakeStrictRedis
+except ImportError:
+    pass
 from app import app, db, Link
 
 @pytest.fixture
