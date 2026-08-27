@@ -1,0 +1,15 @@
+apiVersion: batch/v1
+kind: Job
+metadata: {name: fastapi-seed, namespace: fastapi-url}
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: seed
+          image: fastapi-seed:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - {name: SCYLLA_HOSTS, valueFrom: {configMapKeyRef: {name: fastapi-config, key: SCYLLA_HOSTS}}}
+            - {name: REDIS_URL, valueFrom: {configMapKeyRef: {name: fastapi-config, key: REDIS_URL}}}
