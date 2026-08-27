@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from main import app
 def test_shorten(monkeypatch):
     import dal
+    monkeypatch.setattr(dal, "init_db", lambda: None)
     monkeypatch.setattr(dal, "insert_link", lambda c, u: None)
     c = TestClient(app)
     r = c.post("/api/shorten", json={"url": "https://example.com"})
