@@ -8,6 +8,11 @@ try:
     _redis.Redis = fakeredis.FakeStrictRedis
 except ImportError:
     pass
+# sqlite cannot autoincrement a BIGINT PK (Postgres uses BIGSERIAL).
+# Map BigInteger->Integer for the sqlite-backed unit test only; production
+# code is unchanged and gets BIGSERIAL on Postgres.
+import flask_sqlalchemy
+flask_sqlalchemy.SQLAlchemy.BigInteger = flask_sqlalchemy.SQLAlchemy.Integer
 from app import app, db, Link
 
 @pytest.fixture
