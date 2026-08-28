@@ -1,9 +1,9 @@
 import asyncio
 from datetime import datetime, timezone
 
-from app.domain.codecs import decode, encode
-from app.domain.entities import Link
-from app.services.url_shortener import (
+from shared.domain.codecs import decode, encode
+from shared.domain.entities import Link
+from shared.services.url_shortener import (
     LinkNotFoundError,
     UrlShortenerService,
 )

@@ -4,7 +4,7 @@ from typing import Any
 from django.http import Http404, HttpResponseRedirect
 from django.views import View
 
-from app.services.url_shortener import LinkNotFoundError, UrlShortenerService
+from shared.services.url_shortener import LinkNotFoundError, UrlShortenerService
 
 
 class RedirectView(View):

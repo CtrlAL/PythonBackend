@@ -3,8 +3,8 @@ from datetime import datetime
 
 from typing import Any
 
-from app.domain.entities import Link
-from app.domain.interfaces import LinkRepository
+from shared.domain.entities import Link
+from shared.domain.interfaces import LinkRepository
 
 _EPOCH = datetime.fromtimestamp(0)
 
@@ -18,7 +18,7 @@ class ScyllaLinkRepository:
         if session is not None:
             self._session = session
         else:
-            from app.infrastructure.clients import get_cassandra_session
+            from shared.infrastructure.clients import get_cassandra_session
 
             self._session = get_cassandra_session(hosts)
 

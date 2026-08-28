@@ -1,6 +1,6 @@
 from typing import Any
 
-from app.domain.interfaces import CacheClient
+from shared.domain.interfaces import CacheClient
 
 
 class RedisCacheClient:

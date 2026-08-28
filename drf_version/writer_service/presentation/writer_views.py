@@ -7,8 +7,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from app.presentation.schemas import ShortenRequest, ShortenResponse
-from app.services.url_shortener import UrlShortenerService
+from shared.presentation.schemas import ShortenRequest, ShortenResponse
+from shared.services.url_shortener import UrlShortenerService
 
 
 class ShortenView(APIView):

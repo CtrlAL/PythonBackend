@@ -1,9 +1,9 @@
 import asyncio
 from datetime import datetime, timezone
 
-from app.domain.entities import Link
-from app.infrastructure.clients import get_cassandra_session
-from app.infrastructure.scylla_repository import ScyllaLinkRepository
+from shared.domain.entities import Link
+from shared.infrastructure.clients import get_cassandra_session
+from shared.infrastructure.scylla_repository import ScyllaLinkRepository
 
 
 DEMO_LINKS = [
