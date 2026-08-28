@@ -2,7 +2,7 @@ from typing import Optional
 
 import redis.asyncio as aioredis
 
-from app.domain.interfaces import CacheClient
+from shared.domain.interfaces import CacheClient
 
 
 class RedisCacheClient:

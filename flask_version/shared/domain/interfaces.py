@@ -1,6 +1,6 @@
 from typing import Protocol, runtime_checkable
 
-from app.domain.entities import Link
+from shared.domain.entities import Link
 
 
 @runtime_checkable

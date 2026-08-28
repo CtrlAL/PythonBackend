@@ -4,8 +4,8 @@ import asyncio
 
 from flask import Blueprint, jsonify, request
 
-from app.presentation.schemas import ShortenRequest, ShortenResponse
-from app.services.url_shortener import UrlShortenerService
+from shared.presentation.schemas import ShortenRequest, ShortenResponse
+from shared.services.url_shortener import UrlShortenerService
 
 
 def create_writer_blueprint(

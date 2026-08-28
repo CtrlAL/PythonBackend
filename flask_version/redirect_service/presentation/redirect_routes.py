@@ -4,7 +4,7 @@ import asyncio
 
 from flask import Blueprint, abort, redirect
 
-from app.services.url_shortener import LinkNotFoundError, UrlShortenerService
+from shared.services.url_shortener import LinkNotFoundError, UrlShortenerService
 
 
 def create_redirect_blueprint(service: UrlShortenerService) -> Blueprint:

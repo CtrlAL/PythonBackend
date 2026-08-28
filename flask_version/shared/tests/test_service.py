@@ -3,8 +3,8 @@ from datetime import datetime, timezone
 
 import pytest
 
-from app.domain.entities import Link
-from app.services.url_shortener import LinkNotFoundError, UrlShortenerService
+from shared.domain.entities import Link
+from shared.services.url_shortener import LinkNotFoundError, UrlShortenerService
 
 
 class FakeIdGenerator:

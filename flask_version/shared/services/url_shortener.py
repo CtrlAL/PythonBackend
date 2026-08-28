@@ -1,8 +1,8 @@
 from datetime import datetime, timezone
 
-from app.domain.codecs import encode
-from app.domain.entities import Link
-from app.domain.interfaces import CacheClient, IdGenerator, LinkRepository
+from shared.domain.codecs import encode
+from shared.domain.entities import Link
+from shared.domain.interfaces import CacheClient, IdGenerator, LinkRepository
 
 
 class LinkNotFoundError(Exception):

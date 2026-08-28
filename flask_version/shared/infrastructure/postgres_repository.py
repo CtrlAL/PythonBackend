@@ -4,8 +4,8 @@ from typing import Optional
 
 import psycopg2
 
-from app.domain.entities import Link
-from app.domain.interfaces import LinkRepository
+from shared.domain.entities import Link
+from shared.domain.interfaces import LinkRepository
 
 
 class PostgresLinkRepository:

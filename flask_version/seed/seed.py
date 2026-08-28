@@ -5,9 +5,10 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from app.domain.entities import Link
-from app.infrastructure.database import get_connection
-from app.infrastructure.postgres_repository import PostgresLinkRepository
+from shared.domain.entities import Link
+from shared.domain.codecs import encode
+from shared.infrastructure.database import get_connection
+from shared.infrastructure.postgres_repository import PostgresLinkRepository
 
 DEMO_LINKS = [
     ("exmpl", "https://example.com"),
