@@ -1,11 +1,9 @@
 # fastapi_version/writer/Dockerfile
 FROM python:3.11-slim
 WORKDIR /app
-COPY writer/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY common/ ./common/
-COPY writer/ ./writer/
-WORKDIR /app/writer
+COPY pyproject.toml .
+COPY app/ ./app/
+RUN pip install --no-cache-dir .
 ENV PYTHONPATH=/app
 EXPOSE 8000
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.writer_main:app", "--host", "0.0.0.0", "--port", "8000"]

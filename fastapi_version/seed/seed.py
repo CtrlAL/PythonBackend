@@ -1,7 +1,11 @@
 # fastapi_version/seed/seed.py
+import asyncio
 import os
-import cassandra.cluster
-import redis
+from datetime import datetime, timezone
+
+from app.domain.entities import Link
+from app.infrastructure.redis_cache import RedisCacheClient
+from app.infrastructure.scylla_repository import ScyllaLinkRepository
 
 DEMO_LINKS = [
     ("exmpl", "https://example.com"),
@@ -10,30 +14,32 @@ DEMO_LINKS = [
     ("news", "https://news.ycombinator.com"),
 ]
 
-hosts = os.environ["SCYLLA_HOSTS"].split(",")
-redis_client = redis.Redis.from_url(
-    os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")
-)
-cluster = cassandra.cluster.Cluster(hosts)
-session = cluster.connect()
-session.execute(
-    "CREATE KEYSPACE IF NOT EXISTS urlshort WITH replication = "
-    "{'class':'SimpleStrategy','replication_factor':1}"
-)
-session.set_keyspace("urlshort")
-session.execute(
-    "CREATE TABLE IF NOT EXISTS links (code text PRIMARY KEY, long_url text)"
-)
 
-for code, url in DEMO_LINKS:
-    if session.execute("SELECT code FROM links WHERE code=%s", (code,)).one():
-        print("skip", code)
-        continue
+async def main() -> None:
+    hosts = os.environ["SCYLLA_HOSTS"].split(",")
+    repository = ScyllaLinkRepository(hosts=hosts)
 
-    session.execute(
-        "INSERT INTO links (code, long_url) VALUES (%s, %s)", (code, url)
-    )
-    redis_client.setex(f"short:{code}", 3600, url)
-    print("seeded", code, "->", url)
+    url = os.environ.get("REDIS_URL", "redis://127.0.0.1:6379/0")
+    cache = RedisCacheClient(url=url)
 
-print("seed complete")
+    for code, long_url in DEMO_LINKS:
+
+        if await repository.exists(code):
+            print("skip", code)
+            continue
+
+        await repository.save(
+            Link(
+                short_code=code,
+                long_url=long_url,
+                created_at=datetime.now(timezone.utc),
+            )
+        )
+        await cache.set_with_ttl(f"short:{code}", long_url, 3600)
+        print("seeded", code, "->", long_url)
+
+    print("seed complete")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
