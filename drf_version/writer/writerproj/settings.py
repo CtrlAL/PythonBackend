@@ -1,12 +1,26 @@
 import os
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = "dev-insecure-key"
 DEBUG = True
 ALLOWED_HOSTS = ["*"]
-INSTALLED_APPS = ["django.contrib.contenttypes", "django.contrib.auth", "rest_framework", "links"]
+INSTALLED_APPS = [
+    "django.contrib.contenttypes",
+    "django.contrib.auth",
+    "rest_framework",
+    "links",
+]
 MIDDLEWARE = ["django.middleware.common.CommonMiddleware"]
 ROOT_URLCONF = "writerproj.urls"
-TEMPLATES = [{"BACKEND": "django.template.backends.django.DjangoTemplates", "DIRS": [], "APP_DIRS": False, "OPTIONS": {}}]
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": False,
+        "OPTIONS": {},
+    }
+]
 WSGI_APPLICATION = "writerproj.wsgi.application"
 DATABASES = {}
 LANGUAGE_CODE = "en-us"
