@@ -16,11 +16,13 @@ redis_client = redis.Redis.from_url(REDIS_URL)
 connection = psycopg2.connect(DB_URL)
 cursor = connection.cursor()
 for code, url in DEMO_LINKS:
-    cur.execute("SELECT 1 FROM link WHERE code = %s", (code,))
-    if cur.fetchone():
+    cursor.execute("SELECT 1 FROM link WHERE code = %s", (code,))
+
+    if cursor.fetchone():
         print(f"skip existing {code}")
         continue
-    cur.execute(
+
+    cursor.execute(
         "INSERT INTO link (code, long_url) VALUES (%s, %s)",
         (code, url),
     )
