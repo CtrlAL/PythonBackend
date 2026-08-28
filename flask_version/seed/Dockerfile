@@ -1,7 +1,8 @@
 FROM python:3.11-slim
 WORKDIR /app
-COPY seed/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY seed/seed.py ./
+COPY pyproject.toml .
+RUN pip install --no-cache-dir "psycopg2-binary>=2.9" "redis>=5.0"
+COPY app/ ./app/
+COPY seed/ ./seed/
 ENV PYTHONUNBUFFERED=1
-CMD ["python", "seed.py"]
+CMD ["python", "seed/seed.py"]

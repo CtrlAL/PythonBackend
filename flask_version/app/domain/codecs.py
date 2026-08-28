@@ -7,6 +7,7 @@ def encode(number: int) -> str:
         return ALPHABET[0]
 
     encoded = ""
+
     while number > 0:
         encoded += ALPHABET[number % ALPHABET_SIZE]
         number //= ALPHABET_SIZE
@@ -14,9 +15,10 @@ def encode(number: int) -> str:
     return encoded[::-1]
 
 
-def decode(s: str) -> int:
-    decoded = 0
-    for char in s:
-        decoded = decoded * ALPHABET_SIZE + ALPHABET.index(char)
+def decode(text: str) -> int:
+    number = 0
 
-    return decoded
+    for char in text:
+        number = number * ALPHABET_SIZE + ALPHABET.index(char)
+
+    return number

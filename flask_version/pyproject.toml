@@ -1,0 +1,22 @@
+[project]
+name = "flask-version"
+version = "0.1.0"
+description = "URL shortener (Flask) rewritten in Clean Architecture"
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=3.0,<4.0",
+    "psycopg2-binary>=2.9",
+    "redis>=5.0",
+    "pydantic>=2.0",
+    "uvicorn>=0.20",
+    "pytest>=8.0",
+]
+
+[tool.mypy]
+python_version = "3.12"
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["app/tests"]
