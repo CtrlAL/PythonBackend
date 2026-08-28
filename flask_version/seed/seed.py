@@ -2,7 +2,7 @@ import os
 import redis
 import psycopg2
 
-DEMO = [
+DEMO_LINKS = [
     ("exmpl", "https://example.com"),
     ("git", "https://github.com"),
     ("doc", "https://docs.python.org"),
@@ -11,11 +11,11 @@ DEMO = [
 
 DB_URL = os.environ["DATABASE_URL"]
 REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
-r = redis.Redis.from_url(REDIS_URL)
+redis_client = redis.Redis.from_url(REDIS_URL)
 
-conn = psycopg2.connect(DB_URL)
-cur = conn.cursor()
-for code, url in DEMO:
+connection = psycopg2.connect(DB_URL)
+cursor = connection.cursor()
+for code, url in DEMO_LINKS:
     cur.execute("SELECT 1 FROM link WHERE code = %s", (code,))
     if cur.fetchone():
         print(f"skip existing {code}")
@@ -24,9 +24,9 @@ for code, url in DEMO:
         "INSERT INTO link (code, long_url) VALUES (%s, %s)",
         (code, url),
     )
-    r.setex(f"short:{code}", 3600, url)
+    redis_client.setex(f"short:{code}", 3600, url)
     print(f"seeded {code} -> {url}")
-conn.commit()
-cur.close()
-conn.close()
+connection.commit()
+cursor.close()
+connection.close()
 print("seed complete")

@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
-r = redis.Redis.from_url(os.environ.get("REDIS_URL", "redis://localhost:6379/0"))
+redis_client = redis.Redis.from_url(os.environ.get("REDIS_URL", "redis://localhost:6379/0"))
 BASE_URL = os.environ.get("BASE_URL", "http://localhost")
 
 @app.route("/api/shorten", methods=["POST"])
@@ -36,7 +36,7 @@ def shorten():
         except IntegrityError:
             db.session.rollback()
             return jsonify(error="could not assign code"), 500
-    r.setex(f"short:{code}", 3600, url)
+    redis_client.setex(f"short:{code}", 3600, url)
     return jsonify(code=code, short_url=f"{BASE_URL}/{code}"), 201
 
 @app.route("/healthz", methods=["GET"])

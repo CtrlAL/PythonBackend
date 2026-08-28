@@ -1,17 +1,17 @@
 ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-BASE = len(ALPHABET)
+ALPHABET_SIZE = len(ALPHABET)
 
-def encode(n: int) -> str:
-    if n == 0:
+def encode(number: int) -> str:
+    if number == 0:
         return ALPHABET[0]
-    s = ""
-    while n > 0:
-        s += ALPHABET[n % BASE]
-        n //= BASE
-    return s[::-1]
+    encoded = ""
+    while number > 0:
+        encoded += ALPHABET[number % ALPHABET_SIZE]
+        number //= ALPHABET_SIZE
+    return encoded[::-1]
 
 def decode(s: str) -> int:
-    n = 0
-    for c in s:
-        n = n * BASE + ALPHABET.index(c)
-    return n
+    decoded = 0
+    for char in s:
+        decoded = decoded * ALPHABET_SIZE + ALPHABET.index(char)
+    return decoded

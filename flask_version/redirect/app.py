@@ -4,25 +4,25 @@ import psycopg2
 from flask import Flask, redirect, abort
 
 app = Flask(__name__)
-r = redis.Redis.from_url(os.environ.get("REDIS_URL", "redis://localhost:6379/0"))
+redis_client = redis.Redis.from_url(os.environ.get("REDIS_URL", "redis://localhost:6379/0"))
 DB_URL = os.environ.get("DATABASE_URL", "sqlite:///:memory:")
 
 def get_long_url(code: str):
-    cached = r.get(f"short:{code}")
+    cached = redis_client.get(f"short:{code}")
     if cached:
         return cached.decode()
     if DB_URL.startswith("sqlite"):
         return None
-    conn = psycopg2.connect(DB_URL)
+    connection = psycopg2.connect(DB_URL)
     try:
-        cur = conn.cursor()
-        cur.execute("SELECT long_url FROM link WHERE code = %s", (code,))
-        row = cur.fetchone()
+        cursor = connection.cursor()
+        cursor.execute("SELECT long_url FROM link WHERE code = %s", (code,))
+        row = cursor.fetchone()
     finally:
-        conn.close()
+        connection.close()
     if not row:
         return None
-    r.setex(f"short:{code}", 3600, row[0])
+    redis_client.setex(f"short:{code}", 3600, row[0])
     return row[0]
 
 @app.route("/<code>")
