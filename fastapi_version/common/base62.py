@@ -1,13 +1,14 @@
 # fastapi_version/common/base62.py
 ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-BASE = len(ALPHABET)
+ALPHABET_SIZE = len(ALPHABET)
 def encode(n):
     if n == 0: return ALPHABET[0]
-    s = ""
-    while n > 0:
-        s += ALPHABET[n % BASE]; n //= BASE
-    return s[::-1]
-def decode(s):
-    n = 0
-    for c in s: n = n * BASE + ALPHABET.index(c)
-    return n
+    encoded = ""
+    number = n
+    while number > 0:
+        encoded += ALPHABET[number % ALPHABET_SIZE]; number //= ALPHABET_SIZE
+    return encoded[::-1]
+def decode(encoded):
+    number = 0
+    for char in encoded: number = number * ALPHABET_SIZE + ALPHABET.index(char)
+    return number

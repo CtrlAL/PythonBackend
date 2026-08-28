@@ -1,4 +1,4 @@
-# fastapi_version/common/dal.py
+# fastapi_version/common/data_access.py
 import os, cassandra.cluster
 from cassandra.query import dict_factory
 _session = None

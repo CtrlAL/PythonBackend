@@ -1,23 +1,23 @@
 # fastapi_version/common/snowflake.py
 import time, threading
-EPOCH_MS = 1288834974657
+EPOCH_MILLISECONDS = 1288834974657
 class Snowflake:
     def __init__(self, node_id=1):
         self.node_id = node_id & 0x3FF
         self.lock = threading.Lock()
-        self.seq = 0
-        self.last_ts = 0
-    def _ts(self):
-        return int(time.time() * 1000) - EPOCH_MS
+        self.sequence = 0
+        self.last_timestamp = 0
+    def _current_timestamp(self):
+        return int(time.time() * 1000) - EPOCH_MILLISECONDS
     def next_id(self):
         with self.lock:
-            ts = self._ts()
-            if ts == self.last_ts:
-                self.seq = (self.seq + 1) & 0xFFF
-                if self.seq == 0:
-                    while ts <= self.last_ts:
-                        ts = self._ts()
+            timestamp = self._current_timestamp()
+            if timestamp == self.last_timestamp:
+                self.sequence = (self.sequence + 1) & 0xFFF
+                if self.sequence == 0:
+                    while timestamp <= self.last_timestamp:
+                        timestamp = self._current_timestamp()
             else:
-                self.seq = 0
-            self.last_ts = ts
-            return ((ts << 22) | (self.node_id << 12) | self.seq)
+                self.sequence = 0
+            self.last_timestamp = timestamp
+            return ((timestamp << 22) | (self.node_id << 12) | self.sequence)
