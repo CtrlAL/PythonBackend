@@ -6,8 +6,8 @@ def get_session():
     global _session
     if _session is None:
         hosts = os.environ.get("SCYLLA_HOSTS", "127.0.0.1").split(",")
-        cl = cassandra.cluster.Cluster(hosts)
-        _session = cl.connect()
+        cluster = cassandra.cluster.Cluster(hosts)
+        _session = cluster.connect()
         _session.row_factory = dict_factory
         _session.execute("CREATE KEYSPACE IF NOT EXISTS urlshort WITH replication = {'class':'SimpleStrategy','replication_factor':1}")
         _session.set_keyspace("urlshort")
