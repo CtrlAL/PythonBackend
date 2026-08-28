@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["app*"]
+include = ["shared*", "writer_service*", "redirect_service*"]
 
 [tool.mypy]
 python_version = "3.11"

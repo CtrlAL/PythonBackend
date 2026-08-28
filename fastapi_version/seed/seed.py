@@ -3,9 +3,9 @@ import asyncio
 import os
 from datetime import datetime, timezone
 
-from app.domain.entities import Link
-from app.infrastructure.redis_cache import RedisCacheClient
-from app.infrastructure.scylla_repository import ScyllaLinkRepository
+from shared.domain.entities import Link
+from shared.infrastructure.redis_cache import RedisCacheClient
+from shared.infrastructure.scylla_repository import ScyllaLinkRepository
 
 DEMO_LINKS = [
     ("exmpl", "https://example.com"),
