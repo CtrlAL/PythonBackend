@@ -26,6 +26,7 @@ for code, url in DEMO_LINKS:
     )
     redis_client.setex(f"short:{code}", 3600, url)
     print(f"seeded {code} -> {url}")
+
 connection.commit()
 cursor.close()
 connection.close()

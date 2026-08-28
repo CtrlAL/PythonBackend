@@ -1,5 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
+
 db = SQLAlchemy()
+
 
 class Link(db.Model):
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
