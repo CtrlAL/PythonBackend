@@ -1084,19 +1084,216 @@ deep[<span class="num">0</span>][<span class="num">0</span>] = <span class="num"
         </div>
     </div>
 
-    <!-- More tricky -->
+    <!-- Class mutable default -->
     <div class="card">
-        <h3><span class="emoji">🧩</span> #6–12 Ещё ловушки</h3>
-        <p>В модуле <code>05_tricky.py</code> ещё 7 ловушек:</p>
-        <ul style="color: var(--text-dim); padding-left: 1.5rem; line-height: 2;">
-            <li><strong>String interning</strong> — <code>"hello" is "hello"</code> может быть True (CPython оптимизация), но не надёжно</li>
-            <li><strong>Generator exhaustion</strong> — генератор можно пройти только один раз</li>
-            <li><strong>Star unpacking</strong> — <code>a, *b, c = [1,2,3,4,5]</code></li>
-            <li><strong>Декоратор с аргументами</strong> — тройное замыкание</li>
-            <li><strong>Enum comparison</strong> — <code>Color.RED == 1</code> → False</li>
-            <li><strong>Walrus operator</strong> — присваивание внутри выражения</li>
-            <li><strong>Class mutable default</strong> — тот же баг, но в <code>__init__</code></li>
-        </ul>
+        <h3><span class="emoji">🏗️</span> #6 Class Mutable Default</h3>
+        <p>Тот же баг, что и #1, но в <code>__init__</code> класса. Все экземпляры <strong>делят один список</strong>.</p>
+
+        <div class="comparison">
+            <div class="side bad">
+                <h4>❌ Баг</h4>
+<pre><code><span class="kw">class</span> <span class="cls">Bug</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, items=[]):
+        self.items = items
+
+a = <span class="cls">Bug</span>()
+b = <span class="cls">Bug</span>()
+a.items.<span class="fn">append</span>(<span class="str">"x"</span>)
+
+<span class="bi">print</span>(a.items)  <span class="cm"># ['x']</span>
+<span class="bi">print</span>(b.items)  <span class="cm"># ['x'] — БАГ! b.items = a.items</span></code></pre>
+            </div>
+            <div class="side good">
+                <h4>✅ Фикс</h4>
+<pre><code><span class="kw">class</span> <span class="cls">Fix</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, items=<span class="kw">None</span>):
+        self.items = items <span class="kw">if</span> items <span class="kw">is not None</span> <span class="kw">else</span> []
+
+a = <span class="cls">Fix</span>()
+b = <span class="cls">Fix</span>()
+a.items.<span class="fn">append</span>(<span class="str">"x"</span>)
+
+<span class="bi">print</span>(a.items)  <span class="cm"># ['x']</span>
+<span class="bi">print</span>(b.items)  <span class="cm"># [] — независимый список!</span></code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- String interning -->
+    <div class="card">
+        <h3><span class="emoji">🔤</span> #7 String Interning</h3>
+        <p>CPython автоматически переиспользует ("интернирует") короткие строки. <code>is</code> может работать, но <strong>ненадёжно</strong>.</p>
+
+<pre><code>a = <span class="str">"hello"</span>
+b = <span class="str">"hello"</span>
+c = <span class="str">"hel"</span> + <span class="str">"lo"</span>
+d = <span class="str">"hello!"</span>
+e = d[:-<span class="num">1</span>]
+
+<span class="bi">print</span>(a == b)  <span class="cm"># True — содержимое совпадает</span>
+<span class="bi">print</span>(a <span class="kw">is</span> b)  <span class="cm"># True — CPython interning (оптимизация)</span>
+<span class="bi">print</span>(a <span class="kw">is</span> c)  <span class="cm"># True — тоже interning</span>
+<span class="bi">print</span>(a <span class="kw">is</span> e)  <span class="cm"># False — e создана динамически</span></code></pre>
+
+        <div class="callout danger">
+            <strong>Правило:</strong> Всегда используй <code>==</code> для сравнения строк. <code>is</code> — ТОЛЬКО для <code>None</code>.
+        </div>
+    </div>
+
+    <!-- Generator exhaustion -->
+    <div class="card">
+        <h3><span class="emoji">🔋</span> #8 Generator Exhaustion</h3>
+        <p>Генератор можно пройти <strong>только один раз</strong>. После этого он "исчерпан".</p>
+
+        <div class="comparison">
+            <div class="side bad">
+                <h4>❌ Исчерпание</h4>
+<pre><code><span class="kw">def</span> <span class="fn">my_gen</span>():
+    <span class="kw">yield</span> <span class="num">1</span>
+    <span class="kw">yield</span> <span class="num">2</span>
+    <span class="kw">yield</span> <span class="num">3</span>
+
+g = <span class="fn">my_gen</span>()
+<span class="bi">print</span>(<span class="bi">list</span>(g))  <span class="cm"># [1, 2, 3]</span>
+<span class="bi">print</span>(<span class="bi">list</span>(g))  <span class="cm"># [] — ПУСТО!</span></code></pre>
+            </div>
+            <div class="side good">
+                <h4>✅ Фикс</h4>
+<pre><code><span class="cm"># Вариант 1: фабрика</span>
+<span class="kw">def</span> <span class="fn">make_gen</span>():
+    <span class="kw">def</span> <span class="fn">gen</span>():
+        <span class="kw">yield</span> <span class="num">1</span>; <span class="kw">yield</span> <span class="num">2</span>; <span class="kw">yield</span> <span class="num">3</span>
+    <span class="kw">return</span> gen
+
+factory = <span class="fn">make_gen</span>()
+<span class="bi">print</span>(<span class="bi">list</span>(<span class="fn">factory</span>()))  <span class="cm"># [1, 2, 3]</span>
+<span class="bi">print</span>(<span class="bi">list</span>(<span class="fn">factory</span>()))  <span class="cm"># [1, 2, 3]</span>
+
+<span class="cm"># Вариант 2: itertools.tee</span>
+<span class="kw">import</span> itertools
+a, b = itertools.<span class="fn">tee</span>(g, <span class="num">2</span>)</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Star unpacking -->
+    <div class="card">
+        <h3><span class="emoji">⭐</span> #9 Star Unpacking</h3>
+        <p>Звёздочка собирает "остаток" в список. Работает только с <strong>итерируемыми</strong> объектами.</p>
+
+<pre><code><span class="cm"># Базовый пример</span>
+first, *middle, last = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+<span class="bi">print</span>(first)   <span class="cm"># 1</span>
+<span class="bi">print</span>(middle)  <span class="cm"># [2, 3, 4]</span>
+<span class="bi">print</span>(last)    <span class="cm"># 5</span>
+
+<span class="cm"># Со строками</span>
+first, *middle, last = <span class="str">"hello"</span>
+<span class="bi">print</span>(first)   <span class="cm"># 'h'</span>
+<span class="bi">print</span>(middle)  <span class="cm"># ['e', 'l', 'l']</span>
+<span class="bi">print</span>(last)    <span class="cm"># 'o'</span>
+
+<span class="cm"># В функциях — *args, **kwargs</span>
+<span class="kw">def</span> <span class="fn">func</span>(a, b, *args, **kwargs):
+    <span class="bi">print</span>(args)     <span class="cm"># (3, 4)</span>
+    <span class="bi">print</span>(kwargs)   <span class="cm"># {'x': 5}</span>
+
+<span class="fn">func</span>(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, x=<span class="num">5</span>)</code></pre>
+
+        <div class="callout">
+            <strong>Аналогия из .NET:</strong> <code>params int[] numbers</code> в C# — это <code>*args</code> в Python.
+        </div>
+    </div>
+
+    <!-- Decorator with arguments -->
+    <div class="card">
+        <h3><span class="emoji">🎀</span> #10 Декоратор с аргументами</h3>
+        <p>Декоратор с аргументами — это <strong>тройное замыкание</strong>. Концептуально сложно, но шаблон стандартный.</p>
+
+<pre><code><span class="kw">import</span> functools
+
+<span class="kw">def</span> <span class="fn">retry</span>(times):
+    <span class="str">"""Уровень 1: принимает аргументы."""</span>
+    <span class="kw">def</span> <span class="fn">decorator</span>(func):
+        <span class="str">"""Уровень 2: принимает функцию."""</span>
+        <span class="dec">@functools.wraps</span>(func)
+        <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+            <span class="str">"""Уровень 3: выполняет логику."""</span>
+            <span class="kw">for</span> attempt <span class="kw">in</span> <span class="bi">range</span>(times):
+                <span class="kw">try</span>:
+                    <span class="kw">return</span> <span class="fn">func</span>(*args, **kwargs)
+                <span class="kw">except</span> Exception <span class="kw">as</span> e:
+                    <span class="bi">print</span>(<span class="str">f"  попытка <span class="op">{</span>attempt + <span class="num">1</span><span class="op">}</span>: <span class="op">{</span>e<span class="op">}</span>"</span>)
+            <span class="kw">raise</span> RuntimeError(<span class="str">f"все <span class="op">{</span>times<span class="op">}</span> провалены"</span>)
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> decorator
+
+<span class="dec">@retry</span>(times=<span class="num">3</span>)
+<span class="kw">def</span> <span class="fn">flaky</span>():
+    <span class="kw">import</span> random
+    <span class="kw">if</span> random.<span class="fn">random</span>() < <span class="num">0.7</span>:
+        <span class="kw">raise</span> ValueError(<span class="str">"ошибка"</span>)
+    <span class="kw">return</span> <span class="str">"успех!"</span></code></pre>
+
+        <div class="analogy">
+            <div class="tag">Схема</div>
+            <p><code>@retry(times=3)</code> → <code>retry(3)</code> возвращает <code>decorator</code> → <code>decorator(func)</code> возвращает <code>wrapper</code> → <code>@decorator</code> заменяет func на wrapper.</p>
+        </div>
+    </div>
+
+    <!-- Enum comparison -->
+    <div class="card">
+        <h3><span class="emoji">🎨</span> #11 Enum Comparison</h3>
+        <p>Enum-члены <strong>нельзя сравнивать</strong> с примитивами. <code>Color.RED == 1</code> → False.</p>
+
+<pre><code><span class="kw">from</span> enum <span class="kw">import</span> Enum
+
+<span class="kw">class</span> <span class="cls">Color</span>(Enum):
+    RED = <span class="num">1</span>
+    GREEN = <span class="num">2</span>
+    BLUE = <span class="num">3</span>
+
+<span class="bi">print</span>(Color.RED == <span class="num">1</span>)        <span class="cm"># False — разные типы!</span>
+<span class="bi">print</span>(Color.RED.value == <span class="num">1</span>)  <span class="cm"># True</span>
+
+<span class="cm"># Enum члены НЕ сравнить друг с другом</span>
+<span class="cm"># Color.RED < Color.GREEN  # TypeError!</span>
+
+<span class="cm"># Правильно:</span>
+<span class="kw">if</span> Color.RED.value == <span class="num">1</span>:
+    <span class="bi">print</span>(<span class="str">"это красный"</span>)
+
+<span class="cm"># Или через is:</span>
+<span class="kw">if</span> Color.RED <span class="kw">is</span> Color.RED:
+    <span class="bi">print</span>(<span class="str">"тот же объект"</span>)</code></pre>
+    </div>
+
+    <!-- Walrus operator -->
+    <div class="card">
+        <h3><span class="emoji">🥜</span> #12 Walrus Operator (:=)</h3>
+        <p>Присваивает значение <strong>внутри</strong> выражения. Python 3.8+. Назван в честь моржа (<code>:=</code> похож на клыки).</p>
+
+<pre><code><span class="kw">import</span> re
+
+text = <span class="str">"contact: user@example.com, admin@test.org"</span>
+
+<span class="cm"># Без walrus: regex вызывается дважды</span>
+match = re.<span class="fn">search</span>(<span class="str">r"[\w.]+@[\w.]+"</span>, text)
+<span class="kw">if</span> match:
+    email = match.<span class="fn">group</span>()
+
+<span class="cm"># С walrus: одна строка</span>
+<span class="kw">if</span> m := re.<span class="fn">search</span>(<span class="str">r"[\w.]+@[\w.]+"</span>, text):
+    <span class="bi">print</span>(m.<span class="fn">group</span>())  <span class="cm"># user@example.com</span>
+
+<span class="cm"># В comprehension</span>
+data = [<span class="num">1</span>, -<span class="num">2</span>, <span class="num">3</span>, -<span class="num">4</span>, <span class="num">5</span>]
+results = [(x, x**<span class="num">2</span>) <span class="kw">for</span> x <span class="kw">in</span> data <span class="kw">if</span> (squared := x**<span class="num">2</span>) > <span class="num">4</span>]
+<span class="cm"># [(−2, 4), (−4, 16), (5, 25)]</span></code></pre>
+
+        <div class="callout">
+            <strong>Когда использовать:</strong> Когда вычисляемое значение нужно и в условии, и в результате. Если только в условии — обычный <code>if</code> читабельнее.
+        </div>
     </div>
 </section>
 
