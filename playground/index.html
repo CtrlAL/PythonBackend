@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Playground — Курс для тех, кто хочет понять</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800;900&display=swap');
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --surface2: #1a1a2e;
+            --border: #2a2a3e;
+            --text: #e0e0e8;
+            --text-dim: #8888aa;
+            --accent: #6c5ce7;
+            --accent2: #a29bfe;
+            --green: #00cec9;
+            --pink: #fd79a8;
+            --orange: #fdcb6e;
+            --red: #ff6b6b;
+            --blue: #74b9ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* ── NAV ─────────────────────────────────────────── */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 2rem;
+        }
+
+        nav .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+
+        nav .logo {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+
+        nav .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+
+        nav .nav-links a:hover { color: var(--accent2); }
+
+        /* ── HERO ────────────────────────────────────────── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #fff 30%, var(--accent2) 60%, var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            max-width: 600px;
+            margin-bottom: 2rem;
+        }
+
+        .hero .badge-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .badge {
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .badge.purple { border-color: var(--accent); color: var(--accent2); }
+        .badge.green  { border-color: var(--green); color: var(--green); }
+        .badge.pink   { border-color: var(--pink); color: var(--pink); }
+
+        /* ── SECTIONS ────────────────────────────────────── */
+        section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 5rem 2rem;
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+        }
+
+        .section-number {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 700px;
+        }
+
+        /* ── CARDS ───────────────────────────────────────── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: border-color 0.3s;
+        }
+
+        .card:hover { border-color: var(--accent); }
+
+        .card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h3 .emoji { font-size: 1.5rem; }
+
+        .card p {
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+        }
+
+        .card .highlight {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        .card .warn {
+            color: var(--red);
+            font-weight: 600;
+        }
+
+        /* ── CODE BLOCKS ─────────────────────────────────── */
+        pre {
+            background: #0d0d14;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        pre code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        .code-label {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.8rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ── SYNTAX COLORS ───────────────────────────────── */
+        .kw  { color: var(--accent2); }          /* keywords */
+        .fn  { color: var(--blue); }             /* functions */
+        .str { color: var(--green); }            /* strings */
+        .num { color: var(--orange); }           /* numbers */
+        .cm  { color: #555577; font-style: italic; } /* comments */
+        .op  { color: var(--pink); }             /* operators */
+        .cls { color: var(--orange); font-weight: 600; } /* classes */
+        .dec { color: var(--pink); }             /* decorators */
+        .bi  { color: var(--green); font-weight: 600; } /* builtins */
+
+        /* ── COMPARISON TABLE ────────────────────────────── */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .comparison .side {
+            background: var(--surface2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .comparison .side.bad { border-color: var(--red); }
+        .comparison .side.good { border-color: var(--green); }
+
+        .comparison .side h4 {
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .comparison .side.bad h4 { color: var(--red); }
+        .comparison .side.good h4 { color: var(--green); }
+
+        /* ── ANALOGY BOX ─────────────────────────────────── */
+        .analogy {
+            background: linear-gradient(135deg, rgba(108, 92, 231, 0.1), rgba(253, 121, 168, 0.05));
+            border: 1px solid rgba(108, 92, 231, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .analogy .tag {
+            display: inline-block;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            margin-bottom: 0.8rem;
+        }
+
+        .analogy p {
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        /* ── CALLOUT ─────────────────────────────────────── */
+        .callout {
+            background: rgba(0, 206, 201, 0.08);
+            border-left: 3px solid var(--green);
+            border-radius: 0 12px 12px 0;
+            padding: 1.2rem 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .callout.danger {
+            background: rgba(255, 107, 107, 0.08);
+            border-left-color: var(--red);
+        }
+
+        .callout strong { color: var(--green); }
+        .callout.danger strong { color: var(--red); }
+
+        /* ── VISUAL DIAGRAM ──────────────────────────────── */
+        .diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .diagram .box {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.8rem 1.2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            min-width: 100px;
+        }
+
+        .diagram .arrow {
+            color: var(--accent2);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .diagram .box.active {
+            border-color: var(--green);
+            background: rgba(0, 206, 201, 0.1);
+        }
+
+        .diagram .box.locked {
+            border-color: var(--red);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        /* ── FOOTER ──────────────────────────────────────── */
+        footer {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-dim);
+            border-top: 1px solid var(--border);
+        }
+
+        footer .heart { color: var(--pink); }
+
+        /* ── RESPONSIVE ──────────────────────────────────── */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .comparison { grid-template-columns: 1fr; }
+            nav .nav-links { display: none; }
+        }
+
+        /* ── SCROLLBAR ───────────────────────────────────── */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+    </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════════
+     NAV
+     ════════════════════════════════════════════════════════════ -->
+<nav>
+    <div class="nav-inner">
+        <div class="logo">🐍 Python Playground</div>
+        <ul class="nav-links">
+            <li><a href="#threading">Threading</a></li>
+            <li><a href="#async">Async</a></li>
+            <li><a href="#multiprocessing">Multiprocessing</a></li>
+            <li><a href="#comprehensions">Comprehensions</a></li>
+            <li><a href="#tricky">Tricky</a></li>
+            <li><a href="#metaclasses">Metaclasses</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════════
+     HERO
+     ════════════════════════════════════════════════════════════ -->
+<div class="hero">
+    <h1>Python Playground</h1>
+    <p>Курс по основам Python: от threading до метаклассов. Всё на примерах, без воды, как для полного чайника.</p>
+    <div class="badge-row">
+        <span class="badge purple">6 модулей</span>
+        <span class="badge green">30+ примеров</span>
+        <span class="badge pink">0 скуки</span>
+    </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     1. THREADING
+     ════════════════════════════════════════════════════════════ -->
+<section id="threading">
+    <div class="section-header">
+        <div class="section-number">Модуль 01</div>
+        <h2>Многопоточность (Threading)</h2>
+        <p>Когда один поток не справляется — запускаешь несколько. Но не всё так просто из-за GIL.</p>
+    </div>
+
+    <!-- Что такое поток -->
+    <div class="card">
+        <h3><span class="emoji">🧵</span> Что такое поток?</h3>
+        <p>Поток — это <span class="highlight">линия выполнения</span> внутри процесса. Представь кухню: один повар (процесс) может варить суп, резать салат и ставить чайник — последовательно. А три повара (потока) делают это <strong>одновременно</strong>.</p>
+
+        <div class="analogy">
+            <div class="tag">Аналогия из .NET</div>
+            <p>Если ты знаешь C#: <code>Task.Run()</code> — это примерно то же самое, что <code>threading.Thread</code>. Только в Python всё через модуль <code>threading</code>, а не через <code>System.Threading</code>.</p>
+        </div>
+    </div>
+
+    <!-- GIL -->
+    <div class="card">
+        <h3><span class="emoji">🔒</span> GIL — Great Interceptor of Threads</h3>
+        <p>GIL (Global Interpreter Lock) — мьютекс, который <span class="warn">не даёт двум потокам выполнять Python-код одновременно</span> в одном процессе.</p>
+
+        <div class="diagram">
+            <div class="box">Поток 1<br><small>работает</small></div>
+            <div class="arrow">→</div>
+            <div class="box locked">GIL<br><small>заблокирован</small></div>
+            <div class="arrow">→</div>
+            <div class="box">Поток 2<br><small>ждёт</small></div>
+        </div>
+
+        <div class="callout">
+            <strong>Ключевое:</strong> GIL отпускается при <strong>I/O-операциях</strong> (сеть, файл, БД, <code>time.sleep</code>). Поэтому потоки отлично работают для I/O-bound задач.
+        </div>
+
+        <div class="callout danger">
+            <strong>Плохо:</strong> Если ты считаешь.factorial в 10 потоков — ускорения НЕ будет. GIL не даст. Для CPU-bound нужен <code>multiprocessing</code>.
+        </div>
+    </div>
+
+    <!-- Lock -->
+    <div class="card">
+        <h3><span class="emoji">🔐</span> Lock — защищаем общую переменную</h3>
+        <p>Когда два потока пишут в одну переменную — происходит <strong>гонка (race condition)</strong>. Результат непредсказуем.</p>
+
+<pre><code><span class="cm"># Без lock — гонка</span>
+<span class="kw">global</span> counter
+counter += <span class="num">1</span>  <span class="cm"># атомарная операция? НЕТ!</span>
+<span class="cm"># Поток 1 читает counter=5</span>
+<span class="cm"># Поток 2 читает counter=5</span>
+<span class="cm"># Оба пишут 6</span>
+<span class="cm"># Итого: 6 вместо 7</span>
+
+<span class="cm"># С lock — безопасно</span>
+<span class="kw">with</span> lock:
+    counter += <span class="num">1</span>  <span class="cm"># только один поток за раз</span></code></pre>
+
+        <p>В C# это <code>lock (obj) { ... }</code> или <code>Mutex</code>. В Python — <code>threading.Lock()</code>.</p>
+    </div>
+
+    <!-- ThreadPoolExecutor -->
+    <div class="card">
+        <h3><span class="emoji">⚡</span> ThreadPoolExecutor — пул потоков</h3>
+        <p>Создавать потоки вручную — мучение. Пул переиспует N потоков для M задач. Отправил 100 запросов — 4 потока обработали по 25.</p>
+
+<pre><code><span class="kw">from</span> concurrent.futures <span class="kw">import</span> ThreadPoolExecutor
+
+<span class="kw">def</span> <span class="fn">fetch</span>(url):
+    <span class="cm"># эмулирует запрос к API (0.5 сек)</span>
+    time.sleep(<span class="num">0.5</span>)
+    <span class="kw">return</span> <span class="str">f"данные из <span class="op">{</span>url<span class="op">}</span>"</span>
+
+urls = [<span class="str">"url1"</span>, <span class="str">"url2"</span>, <span class="str">"url3"</span>, <span class="str">"url4"</span>]
+
+<span class="cm"># Последовательно: 4 × 0.5 = 2 сек</span>
+results = [fetch(u) <span class="kw">for</span> u <span class="kw">in</span> urls]
+
+<span class="cm"># В пуле: ~0.5 сек (параллельно!)</span>
+<span class="kw">with</span> ThreadPoolExecutor(max_workers=<span class="num">4</span>) <span class="kw">as</span> pool:
+    results = <span class="bi">list</span>(pool.<span class="fn">map</span>(fetch, urls))</code></pre>
+
+        <div class="analogy">
+            <div class="tag">Аналогия из .NET</div>
+            <p><code>ThreadPoolExecutor</code> ≈ <code>Task.WhenAll</code> + <code>Parallel.ForEach</code>. Пул потоков есть везде — и в .NET, и в Java, и в Go (goroutines).</p>
+        </div>
+    </div>
+
+    <!-- Event -->
+    <div class="card">
+        <h3><span class="emoji">🚦</span> Event — синхронизация потоков</h3>
+        <p>Event позволяет потокам <strong>ждать сигнала</strong> от другого потока.</p>
+
+<pre><code><span class="kw">import</span> threading
+
+event = threading.Event()
+
+<span class="kw">def</span> <span class="fn">waiter</span>(name):
+    <span class="bi">print</span>(<span class="str">f"  <span class="op">{</span>name<span class="op">}</span>: жду сигнал..."</span>)
+    event.<span class="fn">wait</span>()  <span class="cm"># блокируемся пока не set()</span>
+    <span class="bi">print</span>(<span class="str">f"  <span class="op">{</span>name<span class="op">}</span>: пошёл!"</span>)
+
+<span class="cm"># 3 потока ждут</span>
+threads = [threading.Thread(target=waiter, args=(<span class="str">f"t-<span class="op">{</span>i<span class="op">}</span>"</span>,)) <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="num">3</span>)]
+[<span class="op">...</span>t.<span class="fn">start</span>() <span class="kw">for</span> t <span class="kw">in</span> threads]
+
+time.sleep(<span class="num">0.3</span>)
+event.<span class="fn">set</span>()  <span class="cm"># все 3 потока просыпаются!</span></code></pre>
+    </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     2. ASYNC
+     ════════════════════════════════════════════════════════════ -->
+<section id="async">
+    <div class="section-header">
+        <div class="section-number">Модуль 02</div>
+        <h2>Асинхронность (async/await)</h2>
+        <p>Не потоки, не процессы — отдельная модель. Один поток, Thousands of задач, cooperative multitasking.</p>
+    </div>
+
+    <!-- Что такое async -->
+    <div class="card">
+        <h3><span class="emoji">🌀</span> Что такое async/await?</h3>
+        <p>Async — это <span class="highlight">кооперативная многозадачность</span>. Один поток переключается между задачами, когда одна <strong>ждёт</strong> (I/O, сеть, таймер). Не переключается, пока выполняет код.</p>
+
+        <div class="diagram">
+            <div class="box active">Корутина A<br><small>работает</small></div>
+            <div class="arrow">→</div>
+            <div class="box">await<br><small>отдаёт управление</small></div>
+            <div class="arrow">→</div>
+            <div class="box active">Корутина B<br><small>работает</small></div>
+        </div>
+
+        <div class="callout">
+            <strong>Простым языком:</strong> Thread = отдельный повар. Async = один повар, который ставит чайник и пока ждёт режет салат. Не стоит без дела — переключается на другую задачу.
+        </div>
+    </div>
+
+    <!-- Async closures -->
+    <div class="card">
+        <h3><span class="emoji">🪆</span> Async-замыкания</h3>
+        <p>Замыкание — функция, которая <strong>захватывает переменные</strong> из внешней области видимости. Async-замыкание — та же штука, но является корутиной.</p>
+
+<pre><code><span class="kw">def</span> <span class="fn">make_filter</span>(min_score):
+    <span class="cm"># _cache — захваченная переменная</span>
+    _cache = []
+
+    <span class="kw">async def</span> <span class="fn">filter_users</span>(users):
+        <span class="kw">nonlocal</span> _cache
+        <span class="kw">if not</span> _cache:
+            <span class="kw">await</span> asyncio.<span class="fn">sleep</span>(<span class="num">0.01</span>)  <span class="cm"># I/O pause</span>
+            _cache = [u <span class="kw">for</span> u <span class="kw">in</span> users <span class="kw">if</span> u.score >= min_score]
+        <span class="kw">return</span> _cache
+
+    <span class="kw">return</span> filter_users  <span class="cm"># возвращаем корутину</span>
+
+<span class="cm"># Использование:</span>
+high_scorers = <span class="fn">make_filter</span>(min_score=<span class="num">8.0</span>)
+result = <span class="kw">await</span> high_scorers(users)  <span class="cm"># вызываем как корутину</span></code></pre>
+
+        <div class="analogy">
+            <div class="tag">Аналогия из .NET</div>
+            <p>Замыкание в Python — это как лямбда в C#, которая захватывает переменную из внешнего метода. <code>async</code> ≈ <code>async Task&lt;T&gt;</code>.</p>
+        </div>
+    </div>
+
+    <!-- Async SQLite -->
+    <div class="card">
+        <h3><span class="emoji">🗄️</span> Параллельные запросы к SQLite</h3>
+        <p>С <code>aiosqlite</code> можно делать несколько запросов к БД параллельно, не блокируя event loop.</p>
+
+<pre><code><span class="kw">import</span> aiosqlite
+
+<span class="kw">async def</span> <span class="fn">fetch_users</span>(min_score=<span class="num">0.0</span>):
+    <span class="kw">async with</span> aiosqlite.<span class="fn">connect</span>(<span class="str">"db.sqlite"</span>) <span class="kw">as</span> db:
+        <span class="kw">async with</span> db.<span class="fn">execute</span>(
+            <span class="str">"SELECT * FROM users WHERE score >= ?"</span>, (min_score,)
+        ) <span class="kw">as</span> cursor:
+            rows = <span class="kw">await</span> cursor.<span class="fn">fetchall</span>()
+            <span class="kw">return</span> rows
+
+<span class="cm"># 3 запроса ПАРАЛЛЕЛЬНО (не последовательно!)</span>
+results = <span class="kw">await</span> asyncio.<span class="fn">gather</span>(
+    <span class="fn">fetch_users</span>(min_score=<span class="num">5.0</span>),
+    <span class="fn">fetch_users</span>(min_score=<span class="num">8.0</span>),
+    <span class="fn">fetch_users</span>(min_score=<span class="num">9.5</span>),
+)</code></pre>
+    </div>
+
+    <!-- Lazy pipelines -->
+    <div class="card">
+        <h3><span class="emoji">🔗</span> Ленивые вычисления (async-генераторы)</h3>
+        <p>Ленивые вычисления — данные обрабатываются <strong>по мере необходимости</strong>, а не все сразу. Экономит память.</p>
+
+<pre><code><span class="kw">async def</span> <span class="fn">lazy_map</span>(iterable, fn):
+    <span class="str">"""Применяет fn к каждому элементу при итерации."""</span>
+    <span class="kw">async for</span> item <span class="kw">in</span> iterable:
+        <span class="kw">yield</span> <span class="fn">fn</span>(item)
+
+<span class="kw">async def</span> <span class="fn">lazy_filter</span>(iterable, predicate):
+    <span class="str">"""Отдаёт только те, где predicate = True."""</span>
+    <span class="kw">async for</span> item <span class="kw">in</span> iterable:
+        <span class="kw">if</span> <span class="fn">predicate</span>(item):
+            <span class="kw">yield</span> item
+
+<span class="cm"># Пайплайн: БД → map(×2) → filter(≥16) → список</span>
+stream = <span class="fn">fetch_users_stream</span>()
+doubled = <span class="fn">lazy_map</span>(stream, <span class="kw">lambda</span> u: u.score * <span class="num">2</span>)
+filtered = <span class="fn">lazy_filter</span>(doubled, <span class="kw">lambda</span> s: s >= <span class="num">16.0</span>)
+
+results = [s <span class="kw">async for</span> s <span class="kw">in</span> filtered]  <span class="cm"># вот тут данные ЧИТАЮТСЯ</span></code></pre>
+
+        <div class="callout">
+            <strong>Важно:</strong> Пока нет <code>async for</code> — данные не читаются. Это как <code>IEnumerable</code> / <code>yield return</code> в C#.
+        </div>
+    </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     3. MULTIPROCESSING
+     ════════════════════════════════════════════════════════════ -->
+<section id="multiprocessing">
+    <div class="section-header">
+        <div class="section-number">Модуль 03</div>
+        <h2>Мультипроцессы (Multiprocessing)</h2>
+        <p>Когда потоки не помогают (GIL) — запускаешь отдельные процессы. Каждый — свой Python, свой GIL.</p>
+    </div>
+
+    <!-- Процесс vs поток -->
+    <div class="card">
+        <h3><span class="emoji">🏗️</span> Процесс vs Поток</h3>
+        <p><strong>Поток</strong> — одна нить в одном процессе. Делят память. <strong>Процесс</strong> — отдельный Python со своей памятью. Не делят ничего.</p>
+
+        <div class="comparison">
+            <div class="side">
+                <h4>🧵 Поток (threading)</h4>
+                <p>• Делит память<br>• GIL блокирует параллелизм<br>• Лёгкий (мало памяти)<br>• Для I/O-bound задач</p>
+            </div>
+            <div class="side">
+                <h4>⚙️ Процесс (multiprocessing)</h4>
+                <p>• Своя память<br>• Каждый процесс — свой GIL<br>• Тяжёлый (много памяти)<br>• Для CPU-bound задач</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pool -->
+    <div class="card">
+        <h3><span class="emoji">🏊</span> Pool — пул процессов</h3>
+        <p>Аналог ThreadPoolExecutor, но для процессов.</p>
+
+<pre><code><span class="kw">from</span> multiprocessing <span class="kw">import</span> Pool
+<span class="kw">import</span> time
+
+<span class="kw">def</span> <span class="fn">heavy_compute</span>(n):
+    <span class="str">"""Тяжёлое вычисление — 10M операций."""</span>
+    <span class="kw">return</span> <span class="bi">sum</span>(i * i <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(n))
+
+data = [<span class="num">10_000_000</span>] * <span class="num">4</span>
+
+<span class="cm"># Последовательно: ~4 сек</span>
+result_seq = [<span class="fn">heavy_compute</span>(x) <span class="kw">for</span> x <span class="kw">in</span> data]
+
+<span class="cm"># 4 процесса: ~1 сек (реальный параллелизм!)</span>
+<span class="kw">with</span> Pool(processes=<span class="num">4</span>) <span class="kw">as</span> pool:
+    result_par = pool.<span class="fn">map</span>(heavy_compute, data)
+
+<span class="cm"># Ускорение ≈ 4x (на 4 ядрах)</span></code></pre>
+
+        <div class="callout">
+            <strong>GIL обойдён:</strong> Каждый процесс — отдельный интерпретатор Python со своим GIL. 4 ядра = 4 GIL = реальный параллелизм.
+        </div>
+    </div>
+
+    <!-- Shared Memory -->
+    <div class="card">
+        <h3><span class="emoji">🤝</span> Shared Memory — общая память</h3>
+        <p>Процессы не делят память по умолчанию. Но можно явно выделить общий кусок через <code>Array</code> и <code>Value</code>.</p>
+
+<pre><code><span class="kw">from</span> multiprocessing <span class="kw">import</span> Process, Array, Value
+
+<span class="kw">def</span> <span class="fn">increment</span>(shared_array, index, value):
+    <span class="kw">with</span> shared_array.<span class="fn">get_lock</span>():  <span class="cm"># без lock — гонка!</span>
+        shared_array[index] += value
+
+shared = <span class="fn">Array</span>(<span class="str">"i"</span>, [<span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>, <span class="num">0</span>])  <span class="cm"># 4 int</span>
+
+procs = [<span class="fn">Process</span>(target=increment, args=(shared, i, <span class="num">100</span>))
+         <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="num">4</span>)]
+[<span class="op">...</span>p.<span class="fn">start</span>() <span class="kw">for</span> p <span class="kw">in</span> procs]
+[<span class="op">...</span>p.<span class="fn">join</span>() <span class="kw">for</span> p <span class="kw">in</span> procs]
+
+<span class="bi">print</span>(<span class="bi">list</span>(shared))  <span class="cm"># [100, 100, 100, 100]</span></code></pre>
+    </div>
+
+    <!-- Pipe & Queue -->
+    <div class="card">
+        <h3><span class="emoji">📬</span> Pipe и Queue — обмен данными</h3>
+        <p>Процессы не могут просто так передавать данные. Используют <strong>Pipe</strong> (точка-точка) или <strong>Queue</strong> (очередь).</p>
+
+        <div class="comparison">
+            <div class="side">
+                <h4>Pipe</h4>
+                <p>• Два конца: parent + child<br>• Простая передача<br>• Быстрее Queue<br>• Только 2 участника</p>
+            </div>
+            <div class="side">
+                <h4>Queue</h4>
+                <p>• FIFO очередь<br>• Производитель-потребитель<br>• Много producers/consumers<br>• Thread-safe</p>
+            </div>
+        </div>
+
+<pre><code><span class="cm"># Producer-Consumer через Queue</span>
+<span class="kw">def</span> <span class="fn">producer</span>(queue, n):
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(n):
+        queue.<span class="fn">put</span>(i * i)
+    queue.<span class="fn">put</span>(<span class="kw">None</span>)  <span class="cm"># стоп-сигнал</span>
+
+<span class="kw">def</span> <span class="fn">consumer</span>(queue, results):
+    total = <span class="num">0</span>
+    <span class="kw">while True</span>:
+        item = queue.<span class="fn">get</span>()
+        <span class="kw">if</span> item <span class="kw">is None</span>: <span class="kw">break</span>
+        total += item
+    results.<span class="fn">append</span>(total)</code></pre>
+    </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     4. COMPREHENSIONS
+     ════════════════════════════════════════════════════════════ -->
+<section id="comprehensions">
+    <div class="section-header">
+        <div class="section-number">Модуль 04</div>
+        <h2>Comprehensions</h2>
+        <p>Питоновий синтаксис для создания коллекций одной строкой. Читабельнее, быстрее, короче.</p>
+    </div>
+
+    <!-- List -->
+    <div class="card">
+        <h3><span class="emoji">📋</span> List comprehension</h3>
+        <p>Создать список за одну строку вместо цикла из 4 строк.</p>
+
+        <div class="comparison">
+            <div class="side bad">
+                <h4>❌ Цикл</h4>
+<pre><code>result = []
+<span class="kw">for</span> x <span class="kw">in</span> <span class="bi">range</span>(<span class="num">10</span>):
+    <span class="kw">if</span> x % <span class="num">2</span> == <span class="num">0</span>:
+        result.<span class="fn">append</span>(x ** <span class="num">2</span>)</code></pre>
+            </div>
+            <div class="side good">
+                <h4>✅ Comprehension</h4>
+<pre><code>result = [x ** <span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="bi">range</span>(<span class="num">10</span>)
+          <span class="kw">if</span> x % <span class="num">2</span> == <span class="num">0</span>]</code></pre>
+            </div>
+        </div>
+
+<pre><code><span class="cm"># С условием + else</span>
+labels = [<span class="str">"чёт"</span> <span class="kw">if</span> x % <span class="num">2</span> == <span class="num">0</span> <span class="kw">else</span> <span class="str">"нечёт"</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="bi">range</span>(<span class="num">6</span>)]
+<span class="cm"># ['чёт', 'нечёт', 'чёт', 'нечёт', 'чёт', 'нечёт']</span></code></pre>
+    </div>
+
+    <!-- Dict -->
+    <div class="card">
+        <h3><span class="emoji">📖</span> Dict comprehension</h3>
+<pre><code><span class="cm"># Буква → ASCII код</span>
+ascii_map = {<span class="bi">chr</span>(i): i <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="bi">ord</span>(<span class="str">"a"</span>), <span class="bi">ord</span>(<span class="str">"g"</span>) + <span class="num">1</span>)}
+<span class="cm"># {'a': 97, 'b': 98, ..., 'g': 103}</span>
+
+<span class="cm"># Фильтрация словаря</span>
+scores = {<span class="str">"Алиса"</span>: <span class="num">95</span>, <span class="str">"Борис"</span>: <span class="num">67</span>, <span class="str">"Глеб"</span>: <span class="num">42</span>}
+passed = {k: v <span class="kw">for</span> k, v <span class="kw">in</span> scores.<span class="fn">items</span>() <span class="kw">if</span> v >= <span class="num">60</span>}
+<span class="cm"># {'Алиса': 95, 'Борис': 67}</span></code></pre>
+    </div>
+
+    <!-- Generator -->
+    <div class="card">
+        <h3><span class="emoji">🔋</span> Generator comprehension</h3>
+        <p>Ленивый — элементы генерируются <strong>по одному</strong>, не хранятся в памяти.</p>
+
+<pre><code><span class="cm"># () вместо [] — это генератор</span>
+total = <span class="bi">sum</span>(x ** <span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="bi">range</span>(<span class="num">1_000_000</span>))
+<span class="cm"># Не создаёт список из 1M элементов!</span>
+<span class="cm"># Считает сумму на лету.</span></code></pre>
+
+        <div class="callout">
+            <strong>Экономия памяти:</strong> <code>[x**2 for x in range(M)]</code> хранит M чисел. <code>(x**2 for x in range(M))</code> хранит 0 чисел — вычисляет по одному.
+        </div>
+    </div>
+
+    <!-- Nested -->
+    <div class="card">
+        <h3><span class="emoji"> Russian dolls</span> Вложенные comprehension</h3>
+<pre><code>matrix = [[<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>], [<span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>], [<span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>]]
+
+<span class="cm"># Разворачиваем матрицу в плоский список</span>
+flat = [num <span class="kw">for</span> row <span class="kw">in</span> matrix <span class="kw">for</span> num <span class="kw">in</span> row]
+<span class="cm"># [1, 2, 3, 4, 5, 6, 7, 8, 9]</span>
+
+<span class="cm"># Транспонирование</span>
+transposed = [[row[i] <span class="kw">for</span> row <span class="kw">in</span> matrix] <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="num">3</span>)]
+<span class="cm"># [[1, 4, 7], [2, 5, 8], [3, 6, 9]]</span></code></pre>
+    </div>
+
+    <!-- Walrus -->
+    <div class="card">
+        <h3><span class="emoji">🥜</span> Walrus operator (:=)</h3>
+        <p>Присваивает значение <strong>внутри</strong> выражения. Python 3.8+.</p>
+
+<pre><code><span class="cm"># Без walrus: вычисляем len дважды</span>
+<span class="kw">for</span> word <span class="kw">in</span> [<span class="str">"hi"</span>, <span class="str">"hello"</span>, <span class="str">"hey"</span>]:
+    <span class="kw">if</span> <span class="bi">len</span>(word) > <span class="num">2</span>:
+        <span class="bi">print</span>(word, <span class="bi">len</span>(word))
+
+<span class="cm"># С walrus: вычисляем один раз</span>
+result = [(word, length)
+          <span class="kw">for</span> word <span class="kw">in</span> data
+          <span class="kw">if</span> (length := <span class="bi">len</span>(word)) > <span class="num">2</span>]</code></pre>
+    </div>
+
+    <!-- Benchmark -->
+    <div class="card">
+        <h3><span class="emoji">🏎️</span> Бенчмарк: что быстрее?</h3>
+<pre><code><span class="cm"># Результат на 10K элементов × 100 итераций:</span>
+<span class="cm"># цикл:          1.00x (базовый)</span>
+<span class="cm"># comprehension: 1.3x быстрее</span>
+<span class="cm"># map+filter:    1.1x быстрее</span>
+
+<span class="cm"># Comprehension = самый читабельный И быстрый вариант</span></code></pre>
+    </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     5. TRICKY
+     ════════════════════════════════════════════════════════════ -->
+<section id="tricky">
+    <div class="section-header">
+        <div class="section-number">Модуль 05</div>
+        <h2>Tricky Questions</h2>
+        <p>Ловушки, подводные камни и собеседованные вопросы по Python. Знание этих штук — уровень Senior.</p>
+    </div>
+
+    <!-- Mutable default -->
+    <div class="card">
+        <h3><span class="emoji">🪤</span> #1 Mutable Default Argument</h3>
+        <p>Самая famous ловушка Python. <strong>Default argument вычисляется ОДИН раз</strong> при определении функции.</p>
+
+        <div class="comparison">
+            <div class="side bad">
+                <h4>❌ Баг</h4>
+<pre><code><span class="kw">def</span> <span class="fn">append</span>(num, target=[]):
+    target.<span class="fn">append</span>(num)
+    <span class="kw">return</span> target
+
+<span class="fn">append</span>(<span class="num">1</span>)  <span class="cm"># [1]</span>
+<span class="fn">append</span>(<span class="num">2</span>)  <span class="cm"># [1, 2] — БАГ!</span>
+<span class="fn">append</span>(<span class="num">3</span>)  <span class="cm"># [1, 2, 3] — БАГ!</span></code></pre>
+            </div>
+            <div class="side good">
+                <h4>✅ Фикс</h4>
+<pre><code><span class="kw">def</span> <span class="fn">append</span>(num, target=<span class="kw">None</span>):
+    <span class="kw">if</span> target <span class="kw">is None</span>:
+        target = []
+    target.<span class="fn">append</span>(num)
+    <span class="kw">return</span> target
+
+<span class="fn">append</span>(<span class="num">1</span>)  <span class="cm"># [1]</span>
+<span class="fn">append</span>(<span class="num">2</span>)  <span class="cm"># [2] — РАБОТАЕТ!</span></code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Late binding -->
+    <div class="card">
+        <h3><span class="emoji">⏰</span> #2 Late Binding Closures</h3>
+        <p>Замыкания захватывают <strong>переменную</strong>, а не её значение. Вызов происходит <strong>после</strong> завершения цикла.</p>
+
+        <div class="comparison">
+            <div class="side bad">
+                <h4>❌ Баг</h4>
+<pre><code>funcs = []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="num">5</span>):
+    funcs.<span class="fn">append</span>(<span class="kw">lambda</span>: i)
+
+[<span class="fn">f</span>() <span class="kw">for</span> f <span class="kw">in</span> funcs]
+<span class="cm"># [4, 4, 4, 4, 4] — БАГ!</span>
+<span class="cm"># i = 4 ко времени вызова</span></code></pre>
+            </div>
+            <div class="side good">
+                <h4>✅ Фикс</h4>
+<pre><code>funcs = []
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="num">5</span>):
+    funcs.<span class="fn">append</span>(<span class="kw">lambda</span> i=i: i)
+    <span class="cm">#    ^^^ default arg захватывает ТЕКУЩЕЕ значение</span>
+
+[<span class="fn">f</span>() <span class="kw">for</span> f <span class="kw">in</span> funcs]
+<span class="cm"># [0, 1, 2, 3, 4] — РАБОТАЕТ!</span></code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Float -->
+    <div class="card">
+        <h3><span class="emoji">🔬</span> #3 Float точность</h3>
+        <p><code>0.1 + 0.2 != 0.3</code> — это не баг Python, это IEEE 754.</p>
+
+<pre><code><span class="bi">print</span>(<span class="num">0.1</span> + <span class="num">0.2</span>)             <span class="cm"># 0.30000000000000004</span>
+<span class="bi">print</span>(<span class="num">0.1</span> + <span class="num">0.2</span> == <span class="num">0.3</span>)      <span class="cm"># False</span>
+
+<span class="cm"># Фикс:</span>
+<span class="kw">from</span> decimal <span class="kw">import</span> Decimal
+Decimal(<span class="str">"0.1"</span>) + Decimal(<span class="str">"0.2"</span>) == Decimal(<span class="str">"0.3"</span>)  <span class="cm"># True</span>
+
+<span class="cm"># Для денег: копейки, НЕ float</span>
+price = <span class="num">1500</span>  <span class="cm"># 15.00 руб</span></code></pre>
+    </div>
+
+    <!-- GIL question -->
+    <div class="card">
+        <h3><span class="emoji">🔒</span> #4 GIL: потоки vs процессы</h3>
+<pre><code><span class="cm"># Тяжёлое вычисление в 2 потоках:</span>
+<span class="cm"># 1 поток:  1.00 сек</span>
+<span class="cm"># 2 потока: 1.05 сек — НЕ БЫСТРЕЕ!</span>
+
+<span class="cm"># Причина: GIL не даёт двум потокам</span>
+<span class="cm"># выполнять CPU-bound код одновременно</span>
+
+<span class="cm"># Решение:</span>
+<span class="kw">from</span> multiprocessing <span class="kw">import</span> Pool
+<span class="cm"># 4 процесса: ~0.25 сек — реальный параллелизм!</span></code></pre>
+    </div>
+
+    <!-- Shallow copy -->
+    <div class="card">
+        <h3><span class="emoji">📋</span> #5 Shallow vs Deep copy</h3>
+
+        <div class="comparison">
+            <div class="side bad">
+                <h4>❌ Shallow copy</h4>
+<pre><code>original = [[<span class="num">1</span>, <span class="num">2</span>], [<span class="num">3</span>, <span class="num">4</span>]]
+shallow = original.<span class="fn">copy</span>()
+
+shallow[<span class="num">0</span>][<span class="num">0</span>] = <span class="num">99</span>
+<span class="cm"># original[0][0] ТОЖЕ 99!</span>
+<span class="cm"># Копия ссылок, а не значений</span></code></pre>
+            </div>
+            <div class="side good">
+                <h4>✅ Deep copy</h4>
+<pre><code><span class="kw">import</span> copy
+original = [[<span class="num">1</span>, <span class="num">2</span>], [<span class="num">3</span>, <span class="num">4</span>]]
+deep = copy.<span class="fn">deepcopy</span>(original)
+
+deep[<span class="num">0</span>][<span class="num">0</span>] = <span class="num">99</span>
+<span class="cm"># original[0][0] = 1 — НЕ изменился!</span></code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- More tricky -->
+    <div class="card">
+        <h3><span class="emoji">🧩</span> #6–12 Ещё ловушки</h3>
+        <p>В модуле <code>05_tricky.py</code> ещё 7 ловушек:</p>
+        <ul style="color: var(--text-dim); padding-left: 1.5rem; line-height: 2;">
+            <li><strong>String interning</strong> — <code>"hello" is "hello"</code> может быть True (CPython оптимизация), но не надёжно</li>
+            <li><strong>Generator exhaustion</strong> — генератор можно пройти только один раз</li>
+            <li><strong>Star unpacking</strong> — <code>a, *b, c = [1,2,3,4,5]</code></li>
+            <li><strong>Декоратор с аргументами</strong> — тройное замыкание</li>
+            <li><strong>Enum comparison</strong> — <code>Color.RED == 1</code> → False</li>
+            <li><strong>Walrus operator</strong> — присваивание внутри выражения</li>
+            <li><strong>Class mutable default</strong> — тот же баг, но в <code>__init__</code></li>
+        </ul>
+    </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     6. METACLASSES
+     ════════════════════════════════════════════════════════════ -->
+<section id="metaclasses">
+    <div class="section-header">
+        <div class="section-number">Модуль 06</div>
+        <h2>Метаклассы</h2>
+        <p>Классы, экземплярами которых являются другие классы. Фабрики для создания типов. Самая мощная и опасная фича Python.</p>
+    </div>
+
+    <!-- type() -->
+    <div class="card">
+        <h3><span class="emoji">🏭</span> type() — фабрика классов</h3>
+        <p>Всё в Python — объект. Даже класс. <code>type(MyClass)</code> → <code>type</code>. Метакласс по умолчанию.</p>
+
+<pre><code><span class="cm"># Обычный класс:</span>
+<span class="kw">class</span> <span class="cls">Hello</span>:
+    greeting = <span class="str">"привет"</span>
+
+<span class="cm"># То же самое через type():</span>
+<span class="cls">Hello</span> = <span class="fn">type</span>(<span class="str">"Hello"</span>, (), {<span class="str">"greeting"</span>: <span class="str">"привет"</span>})
+
+<span class="cm"># type(name, bases, namespace)</span>
+<span class="cm">#   name     — имя класса</span>
+<span class="cm">#   bases    — базовые классы (кортеж)</span>
+<span class="cm">#   namespace — dict атрибутов и методов</span></code></pre>
+    </div>
+
+    <!-- Custom metaclass -->
+    <div class="card">
+        <h3><span class="emoji">🎭</span> Кастомный метакласс</h3>
+        <p>Метакласс перехватывает <strong>создание класса</strong> и может его модифицировать.</p>
+
+<pre><code><span class="kw">class</span> <span class="cls">UpperAttrMeta</span>(<span class="bi">type</span>):
+    <span class="str">"""Все атрибуты Becomes UPPERCASE."""</span>
+
+    <span class="kw">def</span> <span class="fn">__new__</span>(mcs, name, bases, namespace):
+        upper = {}
+        <span class="kw">for</span> key, value <span class="kw">in</span> namespace.<span class="fn">items</span>():
+            <span class="kw">if not</span> key.<span class="fn">startswith</span>(<span class="str">"_"</span>):
+                upper[key.<span class="fn">upper</span>()] = value
+            <span class="kw">else</span>:
+                upper[key] = value
+        <span class="kw">return</span> <span class="bi">super</span>().<span class="fn">__new__</span>(mcs, name, bases, upper)
+
+<span class="kw">class</span> <span class="cls">MyClass</span>(metaclass=<span class="cls">UpperAttrMeta</span>):
+    greeting = <span class="str">"привет"</span>
+    count = <span class="num">42</span>
+
+obj = <span class="cls">MyClass</span>()
+<span class="bi">print</span>(obj.GREETING)  <span class="cm"># привет</span>
+<span class="bi">print</span>(obj.COUNT)     <span class="cm"># 42</span></code></pre>
+    </div>
+
+    <!-- Singleton -->
+    <div class="card">
+        <h3><span class="emoji">👑</span> Singleton через метакласс</h3>
+        <p>Гарантирует: только один экземпляр класса.</p>
+
+<pre><code><span class="kw">class</span> <span class="cls">SingletonMeta</span>(<span class="bi">type</span>):
+    _instances = {}
+
+    <span class="kw">def</span> <span class="fn">__call__</span>(cls, *args, **kwargs):
+        <span class="kw">if</span> cls <span class="kw">not in</span> cls._instances:
+            cls._instances[cls] = <span class="bi">super</span>().<span class="fn">__call__</span>(*args, **kwargs)
+        <span class="kw">return</span> cls._instances[cls]
+
+<span class="kw">class</span> <span class="cls">Database</span>(metaclass=<span class="cls">SingletonMeta</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, url):
+        self.url = url
+
+db1 = <span class="cls">Database</span>(<span class="str">"pg://localhost"</span>)
+db2 = <span class="cls">Database</span>(<span class="str">"sqlite://:memory:"</span>)
+<span class="bi">print</span>(db1 <span class="kw">is</span> db2)  <span class="cm"># True — тот же объект!</span></code></pre>
+    </div>
+
+    <!-- Plugin system -->
+    <div class="card">
+        <h3><span class="emoji">🔌</span> Автоматическая регистрация плагинов</h3>
+<pre><code>_registry = {}
+
+<span class="kw">class</span> <span class="cls">PluginMeta</span>(<span class="bi">type</span>):
+    <span class="kw">def</span> <span class="fn">__new__</span>(mcs, name, bases, namespace):
+        cls = <span class="bi">super</span>().<span class="fn">__new__</span>(mcs, name, bases, namespace)
+        plugin_name = namespace.<span class="fn">get</span>(<span class="str">"name"</span>)
+        <span class="kw">if</span> plugin_name:
+            _registry[plugin_name] = cls  <span class="cm"># автозапись!</span>
+        <span class="kw">return</span> cls
+
+<span class="kw">class</span> <span class="cls">JsonPlugin</span>(metaclass=<span class="cls">PluginMeta</span>):
+    name = <span class="str">"json"</span>  <span class="cm"># автоматически попал в _registry</span>
+
+<span class="bi">print</span>(_registry)  <span class="cm"># {'json': &lt;class 'JsonPlugin'&gt;}</span></code></pre>
+    </div>
+
+    <!-- __init_subclass__ -->
+    <div class="card">
+        <h3><span class="emoji">🔄</span> __init_subclass__ — современная альтернатива</h3>
+        <p>Python 3.6+ позволяет обойтись без метакласса для простых случаев.</p>
+
+<pre><code><span class="kw">class</span> <span class="cls">Base</span>:
+    registry = {}
+
+    <span class="kw">def</span> <span class="fn">__init_subclass__</span>(cls, plugin_name=<span class="str">""</span>, **kwargs):
+        <span class="bi">super</span>().<span class="fn">__init_subclass__</span>(**kwargs)
+        <span class="kw">if</span> plugin_name:
+            Base.registry[plugin_name] = cls
+
+<span class="kw">class</span> <span class="cls">FastJson</span>(<span class="cls">Base</span>, plugin_name=<span class="str">"fast_json"</span>):
+    <span class="kw">pass</span>
+
+<span class="bi">print</span>(Base.registry)  <span class="cm"># {'fast_json': &lt;class 'FastJson'&gt;}</span></code></pre>
+
+        <div class="callout">
+            <strong>Правило:</strong> Начни с декоратора. Не хватает — <code>__init_subclass__</code>. Всё ещё не хватает — метакласс.
+        </div>
+    </div>
+
+    <!-- When to use -->
+    <div class="card">
+        <h3><span class="emoji">🧭</span> Когда что использовать?</h3>
+        <div class="comparison">
+            <div class="side">
+                <h4>Metaclasses</h4>
+                <p>• Django ORM<br>• SQLAlchemy<br>• Синглтон<br>• Валидация на уровне типа<br>• Контроль создания класса</p>
+            </div>
+            <div class="side">
+                <h4>__init_subclass__</h4>
+                <p>• Регистрация плагинов<br>• Шаблонный метод<br>• Авто-добавление атрибутов<br>• Проще и понятнее</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     FOOTER
+     ════════════════════════════════════════════════════════════ -->
+<footer>
+    <p style="font-size: 1.5rem; margin-bottom: 1rem;">🐍</p>
+    <p>Python Playground — курс для тех, кто хочет понять</p>
+    <p style="margin-top: 0.5rem;">Сделано с <span class="heart">♥</span> и кофе</p>
+    <p style="margin-top: 1rem; font-size: 0.8rem;">
+        <a href="https://github.com/CtrlAL/PythonBackend" style="color: var(--accent2); text-decoration: none;">GitHub →</a>
+    </p>
+</footer>
+
+</body>
+</html>
