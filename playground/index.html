@@ -581,26 +581,40 @@ result = <span class="kw">await</span> high_scorers(users)  <span class="cm"># �
         </div>
     </div>
 
-    <!-- Async SQLite -->
+    <!-- Async SQLAlchemy -->
     <div class="card">
-        <h3><span class="emoji">🗄️</span> Параллельные запросы к SQLite</h3>
-        <p>С <code>aiosqlite</code> можно делать несколько запросов к БД параллельно, не блокируя event loop.</p>
+        <h3><span class="emoji">🗄️</span> SQLAlchemy ORM — параллельные запросы</h3>
+        <p><code>SQLAlchemy</code> — стандарт ORM для Python. Работает через <strong>движок</strong> (engine) и <strong>сессии</strong> (session). Под капотом отправляет SQL, но ты работаешь с объектами.</p>
 
-<pre><code><span class="kw">import</span> aiosqlite
+        <div class="analogy">
+            <div class="tag">Аналогия из .NET</div>
+            <p><code>AsyncSession</code> ≈ <code>DbContext</code> в EF Core. <code>select(User)</code> ≈ LINQ <code>dbContext.Users.Where(...)</code>. <code>engine</code> ≈ <code>DbConnection</code>.</p>
+        </div>
 
-<span class="kw">async def</span> <span class="fn">fetch_users</span>(min_score=<span class="num">0.0</span>):
-    <span class="kw">async with</span> aiosqlite.<span class="fn">connect</span>(<span class="str">"db.sqlite"</span>) <span class="kw">as</span> db:
-        <span class="kw">async with</span> db.<span class="fn">execute</span>(
-            <span class="str">"SELECT * FROM users WHERE score >= ?"</span>, (min_score,)
-        ) <span class="kw">as</span> cursor:
-            rows = <span class="kw">await</span> cursor.<span class="fn">fetchall</span>()
-            <span class="kw">return</span> rows
+<pre><code><span class="kw">from</span> sqlalchemy <span class="kw">import</span> Column, Integer, String, Float, select
+<span class="kw">from</span> sqlalchemy.ext.asyncio <span class="kw">import</span> AsyncSession, create_async_engine
 
-<span class="cm"># 3 запроса ПАРАЛЛЕЛЬНО (не последовательно!)</span>
+<span class="cm"># Модель — как C# entity class</span>
+<span class="kw">class</span> <span class="cls">User</span>(Base):
+    __tablename__ = <span class="str">"users"</span>
+    id    = <span class="fn">Column</span>(Integer, primary_key=<span class="kw">True</span>)
+    name  = <span class="fn">Column</span>(String(<span class="num">50</span>))
+    score = <span class="fn">Column</span>(Float, default=<span class="num">0.0</span>)
+
+<span class="cm"># Движок — как connection string</span>
+engine = <span class="fn">create_async_engine</span>(<span class="str">"sqlite+aiosqlite:///db.sqlite"</span>)
+session_factory = <span class="fn">async_sessionmaker</span>(engine)
+
+<span class="cm"># Запрос — как LINQ</span>
+<span class="kw">async def</span> <span class="fn">fetch_users</span>(min_score):
+    <span class="kw">async with</span> session_factory() <span class="kw">as</span> session:
+        stmt = <span class="fn">select</span>(User).<span class="fn">where</span>(User.score >= min_score)
+        result = <span class="kw">await</span> session.<span class="fn">execute</span>(stmt)
+        <span class="kw">return</span> result.<span class="fn">scalars</span>().<span class="fn">all</span>()
+
+<span class="cm"># 3 запроса ПАРАЛЛЕЛЬНО</span>
 results = <span class="kw">await</span> asyncio.<span class="fn">gather</span>(
-    <span class="fn">fetch_users</span>(min_score=<span class="num">5.0</span>),
-    <span class="fn">fetch_users</span>(min_score=<span class="num">8.0</span>),
-    <span class="fn">fetch_users</span>(min_score=<span class="num">9.5</span>),
+    <span class="fn">fetch_users</span>(<span class="num">5.0</span>), <span class="fn">fetch_users</span>(<span class="num">8.0</span>), <span class="fn">fetch_users</span>(<span class="num">9.5</span>),
 )</code></pre>
     </div>
 
@@ -630,6 +644,101 @@ results = [s <span class="kw">async for</span> s <span class="kw">in</span> filt
         <div class="callout">
             <strong>Важно:</strong> Пока нет <code>async for</code> — данные не читаются. Это как <code>IEnumerable</code> / <code>yield return</code> в C#.
         </div>
+    </div>
+
+    <!-- CRUD -->
+    <div class="card">
+        <h3><span class="emoji">📝</span> CRUD: Create → Read → Update → Delete</h3>
+        <p>Полный цикл работы с данными через SQLAlchemy session.</p>
+
+<pre><code><span class="kw">async with</span> session_factory() <span class="kw">as</span> session:
+    <span class="cm"># CREATE — добавляем объект</span>
+    user = User(name=<span class="str">"Алиса"</span>, email=<span class="str">"alice@mail.com"</span>, score=<span class="num">95.5</span>)
+    session.<span class="fn">add</span>(user)
+    <span class="kw">await</span> session.<span class="fn">commit</span>()
+
+    <span class="cm"># READ — достаём по id</span>
+    <span class="kw">await</span> session.<span class="fn">refresh</span>(user)
+    <span class="bi">print</span>(user.name)  <span class="cm"># Алиса</span>
+
+    <span class="cm"># UPDATE — меняем атрибуты</span>
+    user.score = <span class="num">100.0</span>
+    user.name = <span class="str">"Алиса Великая"</span>
+    <span class="kw">await</span> session.<span class="fn">commit</span>()
+
+    <span class="cm"># DELETE — удаляем</span>
+    <span class="kw">await</span> session.<span class="fn">delete</span>(user)
+    <span class="kw">await</span> session.<span class="fn">commit</span>()</code></pre>
+    </div>
+
+    <!-- Aggregations -->
+    <div class="card">
+        <h3><span class="emoji">📊</span> Агрегации и Raw SQL</h3>
+        <p>SQLAlchemy умеет COUNT, AVG, SUM, MIN, MAX и raw SQL.</p>
+
+<pre><code><span class="kw">from</span> sqlalchemy <span class="kw">import</span> func, text
+
+<span class="kw">async with</span> session_factory() <span class="kw">as</span> session:
+    <span class="cm"># COUNT</span>
+    count = (<span class="kw">await</span> session.<span class="fn">execute</span>(
+        <span class="fn">select</span>(func.<span class="fn">count</span>(User.id))
+    )).<span class="fn">scalar</span>()
+    <span class="bi">print</span>(<span class="str">f"всего: <span class="op">{</span>count<span class="op">}</span>"</span>)
+
+    <span class="cm"># AVG + MIN + MAX</span>
+    avg = (<span class="kw">await</span> session.<span class="fn">execute</span>(
+        <span class="fn">select</span>(func.<span class="fn">avg</span>(User.score))
+    )).<span class="fn">scalar</span>()
+
+    <span class="cm"># RAW SQL — когда ORM не хватает</span>
+    result = <span class="kw">await</span> session.<span class="fn">execute</span>(
+        <span class="fn">text</span>(<span class="str">"SELECT name, score FROM users WHERE score > 90"</span>)
+    )
+    <span class="kw">for</span> name, score <span class="kw">in</span> result.<span class="fn">all</span>():
+        <span class="bi">print</span>(<span class="str">f"  <span class="op">{</span>name<span class="op">}</span>: <span class="op">{</span>score<span class="op">}</span>"</span>)</code></pre>
+    </div>
+
+    <!-- Relationships -->
+    <div class="card">
+        <h3><span class="emoji">🔗</span> Связи: один-ко-многим</h3>
+        <p>Как внешние ключи в БД, но на уровне объектов. User → Orders.</p>
+
+<pre><code><span class="kw">class</span> <span class="cls">User</span>(Base):
+    <span class="cm"># ...</span>
+    orders = <span class="fn">relationship</span>(<span class="str">"Order"</span>, back_populates=<span class="str">"user"</span>)
+
+<span class="kw">class</span> <span class="cls">Order</span>(Base):
+    <span class="cm"># ...</span>
+    user_id = <span class="fn">Column</span>(Integer, ForeignKey(<span class="str">"users.id"</span>))
+    user = <span class="fn">relationship</span>(<span class="str">"User"</span>, back_populates=<span class="str">"orders"</span>)
+
+<span class="cm"># Создаём с связями</span>
+user = User(name=<span class="str">"Борис"</span>)
+user.orders = [Order(product=<span class="str">"Ноутбук"</span>, amount=<span class="num">999.99</span>)]
+
+<span class="cm"># Читаем обратно — SQLAlchemy подгружает автоматически</span>
+<span class="kw">for</span> order <span class="kw">in</span> user.orders:
+    <span class="bi">print</span>(order.product)  <span class="cm"># Ноутбук</span></code></pre>
+    </div>
+
+    <!-- Transactions -->
+    <div class="card">
+        <h3><span class="emoji">💳</span> Транзакции: commit / rollback</h3>
+        <p>Если ошибка — откатываем. Если ок — коммитим. Как в банковском переводе.</p>
+
+<pre><code><span class="kw">async with</span> session_factory() <span class="kw">as</span> session:
+    <span class="cm"># Успешная транзакция</span>
+    <span class="kw">async with</span> session.<span class="fn">begin</span>():
+        session.<span class="fn">add</span>(User(name=<span class="str">"OK"</span>))
+    <span class="bi">print</span>(<span class="str">"COMMIT"</span>)
+
+    <span class="cm"># Откат при ошибке</span>
+    <span class="kw">try</span>:
+        <span class="kw">async with</span> session.<span class="fn">begin</span>():
+            session.<span class="fn">add</span>(User(name=<span class="str">"FAIL"</span>))
+            <span class="kw">raise</span> ValueError(<span class="str">"что-то пошло не так"</span>)
+    <span class="kw">except</span> ValueError:
+        <span class="bi">print</span>(<span class="str">"ROLLBACK"</span>)</code></pre>
     </div>
 </section>
 
