@@ -12,10 +12,13 @@
 
 def task_01():
     """Квадраты нечётных от 1 до 20.
+    
     Ожидается: [1, 9, 25, 49, 81, 121, 169, 225, 289, 361]
     Подсказка: [x**2 for x in range(1, 21) if x % 2 != 0]
     """
-    pass
+    d = {x: x**2 if x % 2 == 0 else x**3 for x in range(1, 21)}
+
+    return [x**2 for x in range(1,21) ]
 
 
 def task_02():
@@ -308,7 +311,7 @@ def task_16():
 def task_17():
     """SQLAlchemy: модель Book + create + get_by_rating.
     Ожидается: количество книг с rating >= 4.0
-    Подсказка: Column, select, Session, DeclarativeBase
+    Подсказка: session.add(Book(...)), session.commit(), select(Book).where(...)
     """
     from sqlalchemy import Column, Float, Integer, String, select, create_engine
     from sqlalchemy.orm import Session, DeclarativeBase
@@ -327,9 +330,7 @@ def task_17():
     engine = create_engine("sqlite:///:memory:")
     Base.metadata.create_all(engine)
 
-    with Session(engine) as session:
-        pass  # ← добавь 3-4 книги, сделай select WHERE rating >= 4.0
-        # return list(session.execute(stmt).scalars().all())
+    pass  # ← создай Session(engine), добавь 3-4 книги, сделай select, верни список
 
 
 # ══════════════════════════════════════════════════════════════════
